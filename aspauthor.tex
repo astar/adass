@@ -57,6 +57,58 @@ subjected to data mining process.
   \end{center}
 \end{figure}
 
+\section{Data Sources}
+The spectra obtained with coud\`e spectrograph of Ond\v{r}ejov
+Observatory 2m telescope were used as a training sample. Files were
+downloaded using SSA protocol. The SSA server is not publicly
+accessible outside of the local network of Ond\v{r}ejov observatory.
+That is why the SSH tunneling of HTTP protocol was used. Two scripts
+for this process were created. First to construct the list of SSA
+compliant addresses, the second to analyse acquired response in
+VOTable format.
+
+As testing sample the spectra from project SEGUE of SDSS were
+selected. This contains 178314 spectra in DR7. A simple SQL query was
+used to generate the list of URL links for individual FITS
+files. 
+
+\section{Spectral Line Parameters}
+
+\textbf{The height of the H$\alpha$ line}
+
+The maximum value in the region of $50\,\textrm{\AA}$ around H$\alpha$
+above the linear fit was extracted from the spectrum.
+
+\textbf{The noise level of the spectrum}
+
+The noise in the spectrum contributes to the characteristics of the
+spectral lines. As an estimator of the noise level the median
+absolute deviation was used. It is defined as:
+%
+\begin{equation}
+  \textrm{mad} = \textrm{median}_{i}\left(\ \left| X_{i} -
+      \textrm{median}_{j} (X_{j}) \right|\ \right)
+\end{equation}
+%
+\textbf{The width of the H$\alpha$ line}
+
+The Gaussian function:
+%
+\begin{equation}
+  \label{eq:gauss2}
+  f(x) =  1 + e^{- { \frac{(x-x_0)^2 }{ S^2} } }
+\end{equation}
+%
+was fitted to the profile of H$\alpha$ spectral line. 
+%
+%% First the robust estimators \citep{launer1979robustness} were computed
+%% and used as input parameters for leastsq\footnote{"leastsqi"s a
+%%   wrapper around MINPACK’s lmdif and lmder algorithms.} method from
+%% scipy.opt module, which minimize the sum of squares.
+%
+
+
+
 
 \section{Degradation of Spectral Resolution}
 
@@ -95,21 +147,6 @@ final spectrum after re-binning
 
 
 %
-\section{Data Sources}
-The spectra obtained with coud\`e spectrograph of Ond\v{r}ejov
-Observatory 2m telescope were used as a training sample. Files were
-downloaded using SSA protocol. The SSA server is not publicly
-accessible outside of the local network of Ond\v{r}ejov observatory.
-That is why the SSH tunneling of HTTP protocol was used. Two scripts
-for this process were created. First to construct the list of SSA
-compliant addresses, the second to analyse acquired response in
-VOTable format.
-
-As testing sample the spectra from project SEGUE of SDSS were
-selected. This contains 178314 spectra in DR7. A simple SQL query was
-used to generate the list of URL links for individual FITS
-files. 
-
 
 \section{Spectral Lines Characteristics}
 As parameters for data mining process characteristic values of
@@ -222,41 +259,6 @@ are as well several highly probable  Be stars like the one on Fig.~5.
 %\begin{center}
 %  \resizebox{1.0\hsize}{!}{\includegraphics{result2}}
 %\end{center}
-%
-
-\section{Spectral Line Parameters}
-
-\textbf{The height of the H$\alpha$ line}
-
-The maximum value in the region of $50\,\textrm{\AA}$ around H$\alpha$
-above the linear fit was extracted from the spectrum.
-
-\textbf{The noise level of the spectrum}
-
-The noise in the spectrum contributes to the characteristics of the
-spectral lines. As an estimator of the noise level the median
-absolute deviation was used. It is defined as:
-%
-\begin{equation}
-  \textrm{mad} = \textrm{median}_{i}\left(\ \left| X_{i} -
-      \textrm{median}_{j} (X_{j}) \right|\ \right)
-\end{equation}
-%
-\textbf{The width of the H$\alpha$ line}
-
-The Gaussian function:
-%
-\begin{equation}
-  \label{eq:gauss2}
-  f(x) =  1 + e^{- { \frac{(x-x_0)^2 }{ S^2} } }
-\end{equation}
-%
-was fitted to the profile of H$\alpha$ spectral line. 
-%
-%% First the robust estimators \citep{launer1979robustness} were computed
-%% and used as input parameters for leastsq\footnote{"leastsqi"s a
-%%   wrapper around MINPACK’s lmdif and lmder algorithms.} method from
-%% scipy.opt module, which minimize the sum of squares.
 %
 
 
