@@ -34,6 +34,14 @@ Decision Trees on almost 200,000 spectra in SDSS SEGUE spectral
 survey.
 \end{abstract}
 
+   \begin{wrapfigure}{r}{0.3\textwidth}
+     \vspace{-50pt}
+     \begin{center}
+       \includegraphics[width=0.4\textwidth]{flowSpectra}
+     \end{center}
+     \vspace{-50pt}
+   \end{wrapfigure}
+
 \section{Process Overview}
 Schema of the process is on the Fig.~1. Using SSA protocol the spectra
 from Ond\v{r}ejov 2m telescope archive server were acquired based on the list of justified Be stars
@@ -48,14 +56,16 @@ characterising the typical Be star H$_\alpha$ emission line were obtained and
 subjected to data mining process.
 %
 %
-\begin{figure}[!htbp]
-  \begin{center}
-    \leavevmode
-    \includegraphics[scale = .4]{flowSpectra}
-    \caption{The data mining process overview}
-    \label{FigStructure}
-  \end{center}
-\end{figure}
+%% \begin{figure}[!htbp]
+%%   \begin{center}
+%%     \leavevmode
+%%     \includegraphics[scale = .4]{flowSpectra}
+%%     \caption{The data mining process overview}
+%%     \label{FigStructure}
+%%   \end{center}
+%% \end{figure}
+
+
 
 \section{Data Sources}
 The spectra obtained with coud\`e spectrograph of Ond\v{r}ejov
@@ -74,32 +84,46 @@ files.
 
 \section{Spectral Line Parameters}
 
-\textbf{The height of the H$\alpha$ line}
+%\textbf{The height of the H$\alpha$ line}
 
 The maximum value in the region of $50\,\textrm{\AA}$ around H$\alpha$
 above the linear fit was extracted from the spectrum.
 
-\textbf{The noise level of the spectrum}
+%\textbf{The noise level of the spectrum}
 
 The noise in the spectrum contributes to the characteristics of the
 spectral lines. As an estimator of the noise level the median
-absolute deviation was used. It is defined as:
+absolute deviation was used, defined as:
 %
 \begin{equation}
   \textrm{mad} = \textrm{median}_{i}\left(\ \left| X_{i} -
       \textrm{median}_{j} (X_{j}) \right|\ \right)
 \end{equation}
 %
-\textbf{The width of the H$\alpha$ line}
+%\textbf{The width of the H$\alpha$ line}
 
-The Gaussian function:
+\noindent The Gaussian function:
 %
 \begin{equation}
   \label{eq:gauss2}
   f(x) =  1 + e^{- { \frac{(x-x_0)^2 }{ S^2} } }
 \end{equation}
 %
-was fitted to the profile of H$\alpha$ spectral line. 
+
+\noindent was fitted to the profile of H$\alpha$ spectral line. First the robust
+estimators were computed and used as input parameters for
+leastsq\footnote{"leastsqi"s a wrapper around MINPACK’s lmdif and
+  lmder algorithms.} method from scipy.opt module, which minimize the
+sum of squares.
+
+\begin{eqnarray}
+  x_0 & = \frac{\textrm{median}(w_jx_j)}{\sum{w_i}}, \\
+  S & = \frac{\textrm{mad}(x_i - x_0)}{\sum{w_i}}.
+\end{eqnarray}
+
+
+
+
 %
 %% First the robust estimators \citep{launer1979robustness} were computed
 %% and used as input parameters for leastsq\footnote{"leastsqi"s a
@@ -132,21 +156,46 @@ spectrum after convolution with the Gaussian profile. The last is the
 final spectrum after re-binning
 
 
-\begin{center}
+
 \begin{figure}[!htbp]
+\vspace{-10pt}
   \begin{center}
     \leavevmode
-    \includegraphics[scale = .6]{convolution}
-    \caption{The convolution with SDSS instrumental profile and re-binning applied on Ond\v{r}ejov spectra}
-    \label{FigConvolution}
+    \includegraphics[scale = .5]{convolution}
+%    \caption{The convolution with SDSS instrumental profile and re-binning applied on Ond\v{r}ejov spectra}
+%    \label{FigConvolution}
   \end{center}
+\vspace{-10pt}
 \end{figure}
 
-\end{center}
-%
 
 
-%
+%\clearpage
+
+\section{Continuum normalization}
+Spectra from SDSS are absolute flux calibrated, while the Ond\v{r}ejov
+spectra state intensity only in ADUs. To be able to compare the size
+and shapes of spectral line profiles the so called rectification of
+spectra was performed. The spectra were divided by the linear function
+roughly representing its (pseudo)continuum. This process ensures the
+compatibility when comparing different spectra. Function polyfit from
+numpy package was used to perform the fit. The solution minimizes the
+squared error. To ensure the compatibility for data mining process
+only the spectral range covered by Ond\v{r}ejov spectra
+($6300-6800\AA$) was considered in SDSS spectra.
+
+
+\begin{equation}
+  \frac{\partial}{\partial q_j} \sum_{i = 1}^n{[y_i -
+    \textrm{f}(q_j, x_i) ]^2} = 0,\hspace{2cm} j = 0,1
+\end{equation}
+
+where 
+
+\begin{equation}
+\textrm{f}(x) = q_1x + q_0  
+\end{equation}
+
 
 \section{Spectral Lines Characteristics}
 As parameters for data mining process characteristic values of
@@ -157,10 +206,11 @@ level in the spectrum.
 
 
 \begin{center}
+\vspace{-10pt}
 \begin{figure}[!htbp]
   \begin{center}
     \leavevmode
-    \includegraphics[scale = .6]{figSpecCharCyg60}
+    \includegraphics[scale = .5]{figSpecCharCyg60}
     \caption{The normalised spectrum of Be star 60 Cyg. The top figure
       depicts the continuum fit. The bottom figure shows the region
       (width of the green line) used for extraction. The position of
@@ -171,10 +221,10 @@ level in the spectrum.
     \label{FigConvolution}
   \end{center}
 \end{figure}
-
+\vspace{-10pt}
 \end{center}
 
-
+\clearpage
 
 \section{Data Mining}
 The decision tree based classification was performed using Weka software with algorithm
@@ -244,7 +294,7 @@ are as well several highly probable  Be stars like the one on Fig.~5.
 \begin{figure}[!htbp]
   \begin{center}
     \leavevmode
-    \includegraphics[scale = .6]{result1}
+    \includegraphics[scale = .5]{result1}
     \caption{The example of candidate Be star found in SDSS
       SEGUE survey using the decision tree shown above.}
     \label{FigConvolution}
@@ -265,6 +315,8 @@ are as well several highly probable  Be stars like the one on Fig.~5.
 
 \acknowledgements The ASP would like to the thank the dedicated researchers that are publishing with the ASP.
 
-%\bibliography{aspauthor}
+
+%\bibliographystyle{plainnat}
+%\bibliography{author}
 
 \end{document}
